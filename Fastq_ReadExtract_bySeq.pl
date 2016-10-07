@@ -29,19 +29,19 @@ my $sequences=LoadFastq($fastqFile);
 # create regular expression pattern based upon query position and query sequence
 my $regexp;
 if ($queryPos) {
-  $regexp=join("","^[ACTGN]{",$queryPos-1,"}",$querySeq);
+  $regexp=join( "", "^[ACTGN]{", $queryPos-1, "}", $querySeq );
 } else {
   $regexp=$querySeq;
 }
 
 open (OUT, ">$outputFile") or die ("Can not open $outputFile for writing.\n");
 # for each sequence check if querySeq exists at the noted position
-foreach my $name (sort keys (%{$sequences})) {
-  if ($sequences->{$name}->{'seq'} =~ m/$regexp/) {
-     my $at=$name;
-     my $plus=$name;
-     $plus=~ s/>/+/;
-     $at=~ s/>/@/;
+foreach my $name (sort keys ( %{$sequences} )) {
+  if ($sequences -> {$name} -> {'seq'} =~ m/$regexp/) {
+     my $at = $name;
+     my $plus = $name;
+     $plus =~ s/>/+/;
+     $at =~ s/>/@/;
      print OUT
        "$at\n$sequences->{$name}->{'seq'}$plus\n$sequences->{$name}->{'qual'}";
   }
@@ -50,7 +50,8 @@ close OUT;
 
 #############################################
 sub LoadFastq {
-  my $fastqFile=shift;
+  # read FASTQ file into a hash of hashes
+  my $fastqFile = shift;
   # ensure fastq file exists else die
   open (IN, "<$fastqFile") or die ("Can not find your input file $fastqFile: No such file or directory\n");
 
@@ -58,19 +59,18 @@ sub LoadFastq {
   my $names;
   my %sequences;
   my $list;
-  my %quals;
 
   # for as long as the file has more data:
   while (<IN>){
     chomp;
-    # place every line in one of the four arrays, 
+    # place every line in one of the two hashes, 
     # using the @ symbol to identify the start of each sequence
     if ($_ =~ /@/) {
-	$names=$_;
-	$names=~ s/@/>/;
-	$sequences{$names}->{'seq'}=<IN>;
-	$list=<IN>;
-	$sequences{$names}->{'quals'}=<IN>;
+	$names = $_;
+	$names =~ s/@/>/;
+	$sequences{$names} -> {'seq'} = <IN>;
+	$list = <IN>;
+	$sequences{$names} -> {'quals'} = <IN>;
     }
   }
   close IN;
@@ -97,6 +97,6 @@ Options:
      -input/-i       input fastq file
      -qSeq/-qS       query sequence
      -qPos/-qP       (optional) query position
-     -output/-o      output fastq file
+     -output/-o      output fastq file name
 
 =cut
