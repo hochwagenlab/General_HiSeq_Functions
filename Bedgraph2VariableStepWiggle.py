@@ -102,13 +102,12 @@ def create_variable_wiggle(bedgraph, bedD):
                 out.append(tmp)
                 
         # to only print out files for chromosomes with information
-        if ( len(out) != 0 ) {
+        if ( len(out) != 0 ):
             # write wig file for individual chromosome
             f = open( filename + "_" + chrName + ".wig", 'w')
             f.write( header )
             f.write( '\n'.join(out) )
             f.close()
-        }
             
         # write to wig file for all chromosomes
  #       g = open( filename + "_all.wig", 'a')
