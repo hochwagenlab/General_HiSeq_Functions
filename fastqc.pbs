@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=1,walltime=1:00:00
+#PBS -N fastqc
+#PBS -M ${USER}@nyu.edu
+#PBS -m abe
+#PBS -o localhost:/scratch/$USER/${PBS_JOBNAME}.o${PBS_JOBID}
+#PBS -e localhost:/scratch/$USER/${PBS_JOBNAME}.o${PBS_JOBID}
+
+cd /scratch/$USER
+
+TAG1=$arg1 # this will be the location of the original fastq files
+
+cd ${TAG1}
+
+module load fastqc/0.11.5
+
+gzip -d *.fastq
+
+shopt -s nullglob # Avoid expanding to *.fastq if there were no .fastq files in directory
+
+for f in *.fastq
+do
+fastqc $f
+done
+
+gzip *.fastq
+
+exit 0;
