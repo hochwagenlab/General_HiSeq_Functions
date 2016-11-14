@@ -1,0 +1,40 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=1,walltime=3:00:00
+#PBS -N Sam2Bedgraph
+#PBS -M ${USER}@nyu.edu
+#PBS -m abe
+#PBS -o localhost:/scratch/${USER}/${PBS_JOBNAME}.o${PBS_JOBID}
+#PBS -e localhost:/scratch/${USER}/${PBS_JOBNAME}.o${PBS_JOBID}
+
+module load samtools/intel/1.2
+module load bedtools/intel/2.23.0 
+
+# Purpose: to convert a folder of SAM files into bedgraphs
+# In this example code, the first folder is assumed be only files mapped to SK1
+# and the second folder is assumed to be only filed mapped to SacCer3
+
+cd /scratch/tem298/sk1/
+
+shopt -s nullglob # Avoid expanding to *.sam if there were no .sam files in directory
+
+for f in *.sam
+do
+  samtools view -h $f > ${f}.bam
+  samtools sort $f.bam ${f}.sorted
+  samtools index $f.sorted.bam
+  samtools view -b $f.sorted.bam | genomeCoverageBed -ibam stdin -bg -g ~/Library/sk1_MvO_V1.chrLen.txt > ${f}.bedgraph
+done
+
+cd ../S288C/
+
+shopt -s nullglob # Avoid expanding to *.sam if there were no .sam files in directory
+
+for g in *.sam
+do
+  samtools view -h ${g} > ${g}.bam
+  samtools sort ${g}.bam ${g}.sorted
+  samtools index ${g}.sorted.bam
+  samtools view -b ${g}.sorted.bam | genomeCoverageBed -ibam stdin -bg -g ~/Library/S288C.chrLen.txt > ${g}.bedgraph
+done
+
+exit 0;
